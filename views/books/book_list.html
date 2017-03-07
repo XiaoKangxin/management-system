@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍分类列表</title>
+    {{include '../shared/_header'}}
+</head>
+
+<body>
+    <div class="weui-tab">
+        <div class="weui-tab__panel">
+            <div class="weui-panel weui-panel_access" id="booksContainer">
+            </div>
+            <div class="weui-btn-area">
+                <div class="weui-btn weui-btn_primary" id="btnLoadMore">加载更多</div>
+            </div>
+        </div>
+        {{include '../shared/_footer_nav'}}
+    </div>
+    {{include '../shared/_bottom'}}
+    <script type="text/javascript">
+        var _type = '{{type}}' //当前的分类
+        var _pageIndex = 1  //当前页码
+        var _pageCount = 1  //总页数
+
+        function loadData(){
+            $.getJSON(`/books/list.json/${_type}/${_pageIndex}`,function(res){
+                if(res.status=="y"){
+                    _pageCount = res.data.pageCount
+                    var strHtml = ''
+                    res.data.res.forEach(function(item){
+                        strHtml += `<a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                                    <div class="weui-media-box__hd">
+                                        <img class="weui-media-box__thumb" src="${item.img}" alt="">
+                                    </div>
+                                    <div class="weui-media-box__bd">
+                                        <h4 class="weui-media-box__title">${item.title}</h4>
+                                        <p class="weui-media-box__desc">${item.author}</p>
+                                        <p class="weui-media-box__desc"><button onclick="doBuy('${item.id}')" class="weui-btn weui-btn_mini weui-btn_warn">购买</button></p>
+                                    </div>
+                                </a>`
+                    })
+                    $('#booksContainer').append(strHtml)
+                }
+            })
+        }
+        loadData()
+        //为加载更多按钮添加click事件
+        $('#btnLoadMore').click(function(){
+            _pageIndex = _pageIndex+1 //当前页码加1
+            if(_pageCount<_pageIndex){
+                $(this).text('没有更多数据...')
+                return
+            }
+            loadData()
+        })
+        function doBuy(id){
+            if({{isLogined}}){
+                ////执行购买操作
+                // alert('购买成功')
+                //通过jQuery.cookie插件获取cookie中的用户id
+                //在localStorage为当前用户添加一个购买信息
+                //[{user:"1",books:[{id:"1"},{id:"2"},{id:"3"}]},
+                //{user:"2",books:[{id:"1"},{id:"3"}]}]
+            }
+            else{
+                window.location.href = "/login"
+            }
+        }
+    </script>
+</body>
